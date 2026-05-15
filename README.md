@@ -21,15 +21,15 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 - Cloudflare Worker forwards to Airtable using secret `AIRTABLE_TOKEN`.
 
 ## Behavior
-- All sections stay visible; panel title buttons scroll directly to the selected section (`User`, `Inbox`, `My tasks`).
+- Sections are vertically stacked and collapsed by default; panel title buttons focus one section at a time (`User`, `Inbox`, `My tasks`).
 - User choice is remembered via `localStorage`; next visit skips user picker when possible.
 - Reset button clears saved user and restarts flow.
 - Loading overlay appears during API operations.
-- Inbox is disabled when user already has assigned work:
-  - researcher + `In progress`
-  - checker + `Done`
+- Inbox behavior:
+  - If the user already has assigned work (`In progress` as researcher, or `Done` as checker), claim actions are blocked.
+  - If the user has completed 5 research tasks in the last rolling 24 hours (based on `done_time`), only **To Research** claims are blocked and a thank-you banner is shown.
 - Inbox cards:
-  - **To Research:** up to 5 `Todo` tasks with tasktype level <= user level
+  - **To Research:** up to 5 `Todo` tasks
   - **To verify:** up to 5 `Done` tasks when user level > 1
 - My tasks cards include:
   - researcher + `In progress`
@@ -38,8 +38,12 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 - Card widths are constrained on desktop for better readability (`max-width: 44rem`).
 - Status transitions:
   - claim research => set `Researcher`, set `Status = In progress`
-  - complete research => `In progress -> Done`
+  - complete research => `In progress -> Done`, and set `done_time` to current ISO date-time
   - complete verify => `Done -> Verified`
+- Task card content:
+  - `task description` appears directly on the card
+  - task type `description` appears in a pop-up when `?` is clicked
+  - no `?` button is shown when task type is blank
 
 ## Deploy API proxy (Cloudflare Worker)
 1. Install Wrangler and login.

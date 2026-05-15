@@ -6,25 +6,28 @@ const html = fs.readFileSync('index.html', 'utf8');
 const js = fs.readFileSync('script.js', 'utf8');
 const css = fs.readFileSync('style.css', 'utf8');
 
-test('inbox heading is renamed to To Research', () => {
-  assert.match(html, /<h2>To Research<\/h2>/);
+test('users list no longer renders visible level label', () => {
+  assert.match(js, /<strong>\$\{u\.name\}<\/strong>/);
+  assert.doesNotMatch(js, /Level \$\{u\.level\}/);
 });
 
-test('my tasks panel title tooltip explains section visibility', () => {
-  assert.match(html, /title="View all your assigned work sections and complete tasks"/);
+test('complete research sets done_time timestamp', () => {
+  assert.match(js, /Status: 'Done', done_time: new Date\(\)\.toISOString\(\)/);
 });
 
-test('my tasks cards render queue labels for to research and to verify', () => {
-  assert.match(js, /return 'To Research';/);
-  assert.match(js, /return 'To Verify';/);
+test('to research lock message appears for 24-hour completion cap', () => {
+  assert.match(js, /Thank you so much for completing these tasks! check back tomorrow to continue helping out\./);
+  assert.match(js, /completedResearchCountLast24h/);
 });
 
-test('panels are scrolled into view instead of hidden', () => {
-  const onlyOpenBlock = js.match(/function onlyOpen\(sectionName\) \{[\s\S]*?\n\}/)?.[0] || '';
-  assert.match(onlyOpenBlock, /scrollIntoView\(/);
-  assert.doesNotMatch(onlyOpenBlock, /classList\.toggle\('hidden'/);
+test('task type help dialog exists and type help button is conditional', () => {
+  assert.match(html, /id="helpDialog"/);
+  assert.match(js, /data-action="show-type-help"/);
+  assert.match(js, /task\.typeDescription\s*\?/);
 });
 
-test('cards have a max width for desktop layouts', () => {
-  assert.match(css, /max-width:44rem;/);
+test('layout uses vertical single-active panel behavior', () => {
+  assert.match(css, /flex-direction:column/);
+  assert.match(css, /\.panel\.is-active \.panel-body/);
+  assert.match(js, /classList\.toggle\('is-active'/);
 });

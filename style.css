@@ -5,16 +5,20 @@ body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 .topbar { margin:10px; padding:12px; display:flex; justify-content:space-between; gap:8px; align-items:center; }
 .topbar-actions { display:flex; gap:8px; align-items:center; }
 .pill { font-size:.9rem; padding:.25rem .6rem; border-radius:999px; background:#eef2ff; }
-.layout { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:10px; padding:10px; }
-.panel { min-width:95%; scroll-snap-align:start; }
+.layout { display:flex; flex-direction:column; gap:10px; padding:10px; }
+.panel { width:100%; }
 .panel-title { width:100%; text-align:left; border:0; background:var(--accent); padding:12px; border-radius:14px 14px 0 0; font-weight:700; }
-.panel-body { padding:12px; }
+.panel-body { padding:12px; max-height:0; overflow:hidden; }
+.panel.is-active .panel-body { max-height:70vh; overflow-y:auto; }
 .hidden { display:none !important; }
 .cards { display:grid; gap:8px; justify-items:start; }
 .task-btn, .user-btn { width:100%; max-width:44rem; text-align:left; border:1px solid #dbe1ea; background:#fff; border-radius:10px; padding:10px; }
 .task-btn:disabled { opacity:.5; }
 .queue-tag { display:inline-block; margin-bottom:6px; background:#eef2ff; color:#1e3a8a; font-size:.8rem; font-weight:700; border-radius:999px; padding:3px 8px; }
+.task-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .task-title { font-weight:700; display:block; }
+.help-btn { border:1px solid #cbd5e1; border-radius:50%; width:24px; height:24px; background:#f8fafc; font-weight:700; cursor:pointer; }
+.task-desc { margin:6px 0; }
 .meta, .hint { font-size:.9rem; color:#4b5563; }
 .lock { background:#fff3cd; border:1px solid #f0c36d; border-radius:8px; padding:8px; font-weight:600; }
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
