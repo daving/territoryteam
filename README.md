@@ -45,10 +45,12 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - complete verify => `Done -> Verified`
 - Task card content:
   - uses Bootstrap cards in responsive grid columns
-  - status and task type level are shown with Bootstrap badges
+  - status is shown with a Bootstrap badge
+  - task type title is prefixed with `Task Type:`
   - each task renders as a compact card with a header bar, border, and a separate action button
   - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked
+  - task type help pop-up stores encoded text in data attributes so long/special-character descriptions render fully in the modal
   - help pop-up content scrolls for long task type descriptions
   - no `?` button is shown when task type is blank
   - when description is missing, the description area stays blank (no fallback sentence)

@@ -41,10 +41,10 @@ function completedResearchCountLast24h(userId) {
 function taskCard(task, action, disabled = false, queueLabel = '', actionLabel = 'Check Out') {
   const queue = queueLabel ? `<span class="badge text-bg-info">${queueLabel}</span>` : '';
   const typeHelp = task.typeDescription
-    ? `<button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" data-action="show-type-help" data-help-title="${task.type || 'Task type'}" data-help-text="${task.typeDescription}" title="What does this task type mean?" aria-label="Show task type help">?</button>`
+    ? `<button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" data-action="show-type-help" data-help-title="${encodeURIComponent(task.type || 'Task type')}" data-help-text="${encodeURIComponent(task.typeDescription)}" title="Show full task type instructions" aria-label="Show task type help">?</button>`
     : '';
   const statusBadgeClass = task.status === 'Todo' ? 'text-bg-secondary' : task.status === 'In progress' ? 'text-bg-warning' : task.status === 'Done' ? 'text-bg-primary' : 'text-bg-success';
-  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div><div class="fw-semibold">${task.type || 'Task'}</div><span class="badge text-bg-dark" title="Task type level">Level ${task.typeLevel || 0}</span></div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status">${task.status}</span><div class="task-desc">${task.description || ''}</div><div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
+  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div class="fw-semibold">Task Type: ${task.type || 'Task'}</div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status">${task.status}</span><div class="task-desc">${task.description || ''}</div><div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
 }
 
 function pickField(fields, keys, fallback = '') {
@@ -138,8 +138,8 @@ function confirmAction(message) {
 }
 
 function showTypeHelp(title, description) {
-  $('helpTitle').textContent = title;
-  $('helpDescription').textContent = description;
+  $('helpTitle').textContent = decodeURIComponent(title);
+  $('helpDescription').textContent = decodeURIComponent(description);
   const modal = bootstrap.Modal.getOrCreateInstance($('helpModal'));
   modal.show();
 }
