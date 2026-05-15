@@ -41,10 +41,12 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - complete research => `In progress -> Done`, and set `done_time` to current ISO date-time
   - complete verify => `Done -> Verified`
 - Task card content:
-  - `task description` appears directly on the card
+  - each task renders as a small square card with a header bar, border, and a separate action button
   - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked
   - no `?` button is shown when task type is blank
+  - when description is missing, the description area stays blank (no fallback sentence)
+  - Inbox cards use a **Check Out** action button; My tasks cards use a **Complete** action button
   - task type now falls back across Airtable schema variants (`name`/`Name`, `Type`/`type`) before defaulting to `Task`
   - cards are arranged in an auto-fit flow layout so they naturally wrap by screen width
 

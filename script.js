@@ -38,12 +38,12 @@ function completedResearchCountLast24h(userId) {
   return state.tasks.filter((t) => t.researcherId === userId && t.doneTime && Date.parse(t.doneTime) >= cutoff).length;
 }
 
-function taskCard(task, action, disabled = false, queueLabel = '') {
+function taskCard(task, action, disabled = false, queueLabel = '', actionLabel = 'Check Out') {
   const queue = queueLabel ? `<div class="queue-tag">${queueLabel}</div>` : '';
   const typeHelp = task.typeDescription
     ? `<button type="button" class="help-btn" data-action="show-type-help" data-help-title="${task.type || 'Task type'}" data-help-text="${task.typeDescription}" title="What does this task type mean?" aria-label="Show task type help">?</button>`
     : '';
-  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}>${queue}<div class="task-header"><span class="task-title">${task.type || 'Task'}</span>${typeHelp}</div><div class="task-desc">${task.description || 'No task description provided.'}</div><div class="meta">Territory ${task.territory}</div></button>`;
+  return `<article class="task-card">${queue}<div class="task-card-header"><span class="task-title">${task.type || 'Task'}</span>${typeHelp}</div><div class="task-card-body"><div class="task-desc">${task.description || ''}</div><div class="meta">Territory ${task.territory}</div><button class="task-action" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article>`;
 }
 
 function pickField(fields, keys, fallback = '') {
@@ -120,7 +120,7 @@ function renderMyTasks() {
     return '';
   };
 
-  $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete', false, queueLabelForTask(t))).join('') || '<p class="meta">No assigned tasks.</p>';
+  $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete', false, queueLabelForTask(t), 'Complete')).join('') || '<p class="meta">No assigned tasks.</p>';
 }
 
 function showMe() { $('currentUserLabel').textContent = state.me ? state.me.name : 'No user'; }

@@ -36,9 +36,23 @@ test('layout uses vertical single-active panel behavior', () => {
   assert.match(css, /\.panel\.is-active \.panel-body/);
   assert.match(js, /classList\.toggle\('is-active'/);
   assert.match(css, /grid-template-columns:repeat\(auto-fit, minmax\(260px, 1fr\)\)/);
+  assert.match(css, /aspect-ratio:1\/1/);
 });
 
 test('task type fallback handles Airtable field name variations', () => {
   assert.match(js, /pickField\(r\.fields, \['name', 'Name'\], 'Task'\)/);
   assert.match(js, /rawType = r\.fields\.Type \|\| r\.fields\.type \|\| null/);
+});
+
+
+test('inbox and my tasks hint copy updated for checkout and complete flow', () => {
+  assert.match(html, /These are some of the tasks that need to be done for territories\. Click the checkout button on a task and get started!/);
+  assert.match(html, /These are your in progress tasks\./);
+});
+
+test('task cards render explicit action buttons and blank descriptions when absent', () => {
+  assert.match(js, /class=\"task-action\"/);
+  assert.match(js, /actionLabel = 'Check Out'/);
+  assert.match(js, /taskCard\(t, 'complete', false, queueLabelForTask\(t\), 'Complete'\)/);
+  assert.match(js, /task\.description \|\| ''/);
 });
