@@ -21,7 +21,7 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 - Cloudflare Worker forwards to Airtable using secret `AIRTABLE_TOKEN`.
 
 ## Behavior
-- One section shown at a time (`User`, `Inbox`, `My tasks`).
+- All sections stay visible; panel title buttons scroll directly to the selected section (`User`, `Inbox`, `My tasks`).
 - User choice is remembered via `localStorage`; next visit skips user picker when possible.
 - Reset button clears saved user and restarts flow.
 - Loading overlay appears during API operations.
@@ -29,11 +29,13 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - researcher + `In progress`
   - checker + `Done`
 - Inbox cards:
-  - **Research:** up to 5 `Todo` tasks with tasktype level <= user level
+  - **To Research:** up to 5 `Todo` tasks with tasktype level <= user level
   - **To verify:** up to 5 `Done` tasks when user level > 1
 - My tasks cards include:
   - researcher + `In progress`
   - checker + `Done`
+  - queue labels so each card is marked `To Research` or `To Verify`
+- Card widths are constrained on desktop for better readability (`max-width: 44rem`).
 - Status transitions:
   - claim research => set `Researcher`, set `Status = In progress`
   - complete research => `In progress -> Done`
@@ -54,6 +56,6 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 
 ## Local checks
 ```bash
-node --test logic.test.js worker.test.js
+node --test logic.test.js worker.test.js config.test.js ui.test.js
 node --check script.js
 ```
