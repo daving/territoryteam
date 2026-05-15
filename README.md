@@ -2,6 +2,8 @@
 
 GitHub Pages single-page mobile web app for territory task workflow, backed by Airtable through a secure serverless proxy.
 
+Current app version: **1.1.0**.
+
 ## Files
 - `index.html` – app UI and sections
 - `style.css` – Bootstrap-friendly mobile-first style overrides
@@ -23,6 +25,7 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 ## Behavior
 - Frontend rebuilt with **Bootstrap 5.3 via CDN** (no React, no build step, no npm).
 - Navigation uses a **responsive sticky Bootstrap navbar** and card-based sections.
+- Navbar displays current app version for release tracking; increment it on every shipped update.
 - All major UI blocks are card-based, including section containers and task/user cards in responsive grid layouts.
 - Sections remain mobile-first; one section is visible at a time based on navbar shortcuts (`User`, `Inbox`, `My tasks`).
 - User choice is remembered via `localStorage`; next visit skips user picker when possible.
@@ -50,6 +53,8 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - each task renders as a compact card with a header bar, border, and a separate action button
   - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked
+  - help pop-up supports safe rich text from task type descriptions (paragraphs/lists/emphasis/links/code)
+  - help pop-up sanitizes rich text and only permits safe links (`https`, `http`, `mailto`)
   - task type help pop-up stores encoded text in data attributes so long/special-character descriptions render fully in the modal
   - help pop-up content scrolls for long task type descriptions
   - no `?` button is shown when task type is blank

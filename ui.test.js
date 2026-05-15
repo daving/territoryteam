@@ -26,6 +26,9 @@ test('task cards render status badge and task type label', () => {
 test('task type help stores full description safely for modal rendering', () => {
   assert.match(js, /data-help-text="\$\{encodeURIComponent\(task\.typeDescription\)\}"/);
   assert.match(js, /decodeURIComponent\(description\)/);
+  assert.match(js, /\$\('helpDescription'\)\.innerHTML = sanitized/);
+  assert.match(js, /function sanitizeHelpHtml\(input\)/);
+  assert.match(js, /allowedTags = new Set\(\['P', 'BR', 'UL', 'OL', 'LI', 'EM', 'STRONG', 'B', 'I', 'A', 'CODE'\]\)/);
 });
 
 test('confirm and help actions use Bootstrap modals', () => {
@@ -37,4 +40,12 @@ test('confirm and help actions use Bootstrap modals', () => {
 test('responsive sticky navbar exists', () => {
   assert.match(html, /navbar navbar-expand-lg/);
   assert.match(html, /sticky-top/);
+});
+
+test('app version is visible in the navbar and wired to config', () => {
+  assert.match(html, /id="appVersion"/);
+  assert.match(html, /v1\.1\.0/);
+  assert.match(js, /const APP_VERSION = '1\.1\.0';/);
+  assert.match(js, /\$\('appVersion'\)\.textContent = `v\$\{APP_VERSION\}`/);
+  assert.match(js, /window\.__appConfig = \{ BASE_ID, API_ROOT, STORAGE_KEY, APP_VERSION \};/);
 });

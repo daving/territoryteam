@@ -1,6 +1,7 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
+const APP_VERSION = '1.1.0';
 const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -139,9 +140,45 @@ function confirmAction(message) {
 
 function showTypeHelp(title, description) {
   $('helpTitle').textContent = decodeURIComponent(title);
-  $('helpDescription').textContent = decodeURIComponent(description);
+  const parsed = decodeURIComponent(description);
+  const sanitized = sanitizeHelpHtml(parsed);
+  $('helpDescription').innerHTML = sanitized;
   const modal = bootstrap.Modal.getOrCreateInstance($('helpModal'));
   modal.show();
+}
+
+function sanitizeHelpHtml(input) {
+  const template = document.createElement('template');
+  template.innerHTML = String(input || '');
+  const allowedTags = new Set(['P', 'BR', 'UL', 'OL', 'LI', 'EM', 'STRONG', 'B', 'I', 'A', 'CODE']);
+
+  const walk = (node) => {
+    [...node.children].forEach((child) => {
+      if (!allowedTags.has(child.tagName)) {
+        child.replaceWith(document.createTextNode(child.textContent || ''));
+        return;
+      }
+
+      [...child.attributes].forEach((attr) => {
+        if (child.tagName === 'A' && attr.name === 'href') {
+          const href = child.getAttribute('href') || '';
+          const isSafeHref = /^https?:\/\//i.test(href) || href.startsWith('mailto:');
+          if (!isSafeHref) child.removeAttribute('href');
+          else {
+            child.setAttribute('target', '_blank');
+            child.setAttribute('rel', 'noopener noreferrer');
+          }
+          return;
+        }
+        child.removeAttribute(attr.name);
+      });
+
+      walk(child);
+    });
+  };
+
+  walk(template.content);
+  return template.innerHTML;
 }
 
 async function patchTask(id, fields) {
@@ -156,6 +193,7 @@ async function patchTask(id, fields) {
 
 async function boot() {
   await loadData();
+  $('appVersion').textContent = `v${APP_VERSION}`;
   renderUsers();
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) state.me = state.users.find((u) => u.id === saved) || null;
@@ -224,4 +262,4 @@ boot().catch((err) => {
   alert('Failed to load data from API proxy. Check worker deployment and env vars.');
 });
 
-window.__appConfig = { BASE_ID, API_ROOT, STORAGE_KEY };
+window.__appConfig = { BASE_ID, API_ROOT, STORAGE_KEY, APP_VERSION };
