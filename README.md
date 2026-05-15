@@ -2,7 +2,7 @@
 
 GitHub Pages single-page mobile web app for territory task workflow, backed by Airtable through a secure serverless proxy.
 
-Current app version: **1.1.0**.
+Current app version: **1.1.1**.
 
 ## Files
 - `index.html` – app UI and sections
@@ -53,7 +53,8 @@ Current app version: **1.1.0**.
   - each task renders as a compact card with a header bar, border, and a separate action button
   - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked
-  - help pop-up supports safe rich text from task type descriptions (paragraphs/lists/emphasis/links/code)
+  - help pop-up supports markdown-rich text from task type descriptions (line breaks/bullets/emphasis/links/code blocks/quotes)
+  - markdown parsing is powered by CDN-loaded `marked` and sanitized by CDN-loaded `DOMPurify`
   - help pop-up sanitizes rich text and only permits safe links (`https`, `http`, `mailto`)
   - task type help pop-up stores encoded text in data attributes so long/special-character descriptions render fully in the modal
   - help pop-up content scrolls for long task type descriptions

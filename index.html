@@ -15,7 +15,7 @@
 
   <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top" title="Sticky navigation for quick access to all sections.">
     <div class="container-fluid">
-      <a class="navbar-brand fw-semibold" href="#" title="Territory Team app name and current release version.">Territory Team <span id="appVersion" class="badge text-bg-light border ms-1" title="Incremented every app update for release tracking.">v1.1.0</span></a>
+      <a class="navbar-brand fw-semibold" href="#" title="Territory Team app name and current release version.">Territory Team <span id="appVersion" class="badge text-bg-light border ms-1" title="Incremented every app update for release tracking.">v1.1.1</span></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -86,7 +86,7 @@
           <h3 class="modal-title fs-5" id="helpTitle"></h3>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" title="Supports rich text formatting from task-type help, with safe link handling."><div id="helpDescription" class="mb-0"></div></div>
+        <div class="modal-body" title="Supports markdown-rich help text (line breaks, bullets, links, code) with safe sanitizing."><div id="helpDescription" class="mb-0"></div></div>
       </div>
     </div>
   </div>
@@ -108,6 +108,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
