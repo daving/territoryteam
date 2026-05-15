@@ -19,9 +19,8 @@ async function api(path, options = {}) {
 }
 
 function onlyOpen(sectionName) {
-  document.querySelectorAll('.panel').forEach((el) => {
-    el.classList.toggle('hidden', el.dataset.section !== sectionName);
-  });
+  const target = document.querySelector(`.panel[data-section="${sectionName}"]`);
+  if (target) target.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
 }
 
 function hasAssigned(userId) {
@@ -32,8 +31,9 @@ function myTasks(userId) {
   return state.tasks.filter((t) => (t.researcherId === userId && t.status === 'In progress') || (t.checkerId === userId && t.status === 'Done'));
 }
 
-function taskCard(task, action, disabled = false) {
-  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}><span class="task-title">${task.type}</span>${task.description}<div class="meta">${task.territory}</div></button>`;
+function taskCard(task, action, disabled = false, queueLabel = '') {
+  const queue = queueLabel ? `<div class="queue-tag">${queueLabel}</div>` : '';
+  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}>${queue}<span class="task-title">${task.type}</span>${task.description}<div class="meta">${task.territory}</div></button>`;
 }
 
 async function loadData() {
@@ -80,7 +80,13 @@ function renderInbox() {
 
 function renderMyTasks() {
   if (!state.me) return;
-  $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete')).join('') || '<p class="meta">No assigned tasks.</p>';
+  const queueLabelForTask = (t) => {
+    if (t.researcherId === state.me.id && t.status === 'In progress') return 'To Research';
+    if (t.checkerId === state.me.id && t.status === 'Done') return 'To Verify';
+    return '';
+  };
+
+  $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete', false, queueLabelForTask(t))).join('') || '<p class="meta">No assigned tasks.</p>';
 }
 
 function showMe() {

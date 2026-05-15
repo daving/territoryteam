@@ -10,9 +10,10 @@ body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 .panel-title { width:100%; text-align:left; border:0; background:var(--accent); padding:12px; border-radius:14px 14px 0 0; font-weight:700; }
 .panel-body { padding:12px; }
 .hidden { display:none !important; }
-.cards { display:grid; gap:8px; }
-.task-btn, .user-btn { width:100%; text-align:left; border:1px solid #dbe1ea; background:#fff; border-radius:10px; padding:10px; }
+.cards { display:grid; gap:8px; justify-items:start; }
+.task-btn, .user-btn { width:100%; max-width:44rem; text-align:left; border:1px solid #dbe1ea; background:#fff; border-radius:10px; padding:10px; }
 .task-btn:disabled { opacity:.5; }
+.queue-tag { display:inline-block; margin-bottom:6px; background:#eef2ff; color:#1e3a8a; font-size:.8rem; font-weight:700; border-radius:999px; padding:3px 8px; }
 .task-title { font-weight:700; display:block; }
 .meta, .hint { font-size:.9rem; color:#4b5563; }
 .lock { background:#fff3cd; border:1px solid #f0c36d; border-radius:8px; padding:8px; font-weight:600; }
