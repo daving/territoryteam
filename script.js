@@ -43,7 +43,14 @@ function taskCard(task, action, disabled = false, queueLabel = '') {
   const typeHelp = task.typeDescription
     ? `<button type="button" class="help-btn" data-action="show-type-help" data-help-title="${task.type || 'Task type'}" data-help-text="${task.typeDescription}" title="What does this task type mean?" aria-label="Show task type help">?</button>`
     : '';
-  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}>${queue}<div class="task-header"><span class="task-title">${task.type || 'Untyped task'}</span>${typeHelp}</div><div class="task-desc">${task.description || 'No task description provided.'}</div><div class="meta">${task.territory}</div></button>`;
+  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}>${queue}<div class="task-header"><span class="task-title">${task.type || 'Task'}</span>${typeHelp}</div><div class="task-desc">${task.description || 'No task description provided.'}</div><div class="meta">Territory ${task.territory}</div></button>`;
+}
+
+function pickField(fields, keys, fallback = '') {
+  for (const key of keys) {
+    if (fields[key] !== undefined && fields[key] !== null && fields[key] !== '') return fields[key];
+  }
+  return fallback;
 }
 
 async function loadData() {
@@ -51,10 +58,20 @@ async function loadData() {
   try {
     const [users, tasks, tasktypes] = await Promise.all([api('/users'), api('/tasks'), api('/tasktypes')]);
     state.users = users.records.map((r) => ({ id: r.id, name: r.fields.Name, level: Number(r.fields.level || 1) }));
-    state.taskTypes = new Map(tasktypes.records.map((r) => [r.id, { name: r.fields.name || '', level: Number(r.fields.level || 0), description: r.fields.description || '' }]));
+    state.taskTypes = new Map(tasktypes.records.map((r) => {
+      const typeName = pickField(r.fields, ['name', 'Name'], 'Task');
+      return [r.id, {
+        name: typeName,
+        level: Number(pickField(r.fields, ['level', 'Level'], 0)),
+        description: pickField(r.fields, ['description', 'Description'], '')
+      }];
+    }));
     state.tasks = tasks.records.map((r) => {
-      const typeId = (r.fields.Type || [])[0];
-      const type = state.taskTypes.get(typeId) || { name: '', level: 0, description: '' };
+      const rawType = r.fields.Type || r.fields.type || null;
+      const typeId = Array.isArray(rawType) ? rawType[0] : rawType;
+      const typeById = state.taskTypes.get(typeId);
+      const typeByName = [...state.taskTypes.values()].find((candidate) => candidate.name === typeId);
+      const type = typeById || typeByName || { name: 'Task', level: 0, description: '' };
       return {
         id: r.id,
         territory: r.fields.Territory || '',

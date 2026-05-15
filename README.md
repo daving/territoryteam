@@ -42,8 +42,11 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - complete verify => `Done -> Verified`
 - Task card content:
   - `task description` appears directly on the card
+  - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked
   - no `?` button is shown when task type is blank
+  - task type now falls back across Airtable schema variants (`name`/`Name`, `Type`/`type`) before defaulting to `Task`
+  - cards are arranged in an auto-fit flow layout so they naturally wrap by screen width
 
 ## Deploy API proxy (Cloudflare Worker)
 1. Install Wrangler and login.
@@ -51,6 +54,7 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
    ```bash
    wrangler secret put AIRTABLE_TOKEN
    ```
+   Use your Airtable PAT (for example: the key you provided) as the secret value so it is stored server-side and never exposed in frontend code.
 3. Deploy worker:
    ```bash
    wrangler deploy
