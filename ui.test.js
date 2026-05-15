@@ -18,10 +18,14 @@ test('sections remain card based and mobile-first', () => {
   assert.match(css, /\.app-section \{ display: none; \}/);
 });
 
-test('task cards render status and level badges', () => {
-  assert.match(js, /badge text-bg-dark/);
-  assert.match(js, /Level \$\{task\.typeLevel \|\| 0\}/);
+test('task cards render status badge and task type label', () => {
+  assert.match(js, /Task Type: \$\{task\.type \|\| 'Task'\}/);
   assert.match(js, /Current task status/);
+});
+
+test('task type help stores full description safely for modal rendering', () => {
+  assert.match(js, /data-help-text="\$\{encodeURIComponent\(task\.typeDescription\)\}"/);
+  assert.match(js, /decodeURIComponent\(description\)/);
 });
 
 test('confirm and help actions use Bootstrap modals', () => {
