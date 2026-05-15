@@ -4,7 +4,7 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 
 ## Files
 - `index.html` – app UI and sections
-- `style.css` – card-based mobile styles
+- `style.css` – Bootstrap-friendly mobile-first style overrides
 - `script.js` – frontend behavior and API calls to `/api/*`
 - `worker.js` – Cloudflare Worker API proxy that holds Airtable token server-side
 - `wrangler.toml` – Worker configuration
@@ -21,7 +21,10 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 - Cloudflare Worker forwards to Airtable using secret `AIRTABLE_TOKEN`.
 
 ## Behavior
-- Sections are vertically stacked and collapsed by default; panel title buttons focus one section at a time (`User`, `Inbox`, `My tasks`).
+- Frontend rebuilt with **Bootstrap 5.3 via CDN** (no React, no build step, no npm).
+- Navigation uses a **responsive sticky Bootstrap navbar** and card-based sections.
+- All major UI blocks are card-based, including section containers and task/user cards in responsive grid layouts.
+- Sections remain mobile-first; one section is visible at a time based on navbar shortcuts (`User`, `Inbox`, `My tasks`).
 - User choice is remembered via `localStorage`; next visit skips user picker when possible.
 - Reset button clears saved user and restarts flow.
 - Loading overlay appears during API operations.
@@ -41,6 +44,8 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - complete research => `In progress -> Done`, and set `done_time` to current ISO date-time
   - complete verify => `Done -> Verified`
 - Task card content:
+  - uses Bootstrap cards in responsive grid columns
+  - status and task type level are shown with Bootstrap badges
   - each task renders as a compact card with a header bar, border, and a separate action button
   - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked

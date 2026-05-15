@@ -9,7 +9,7 @@ const state = { users: [], tasks: [], taskTypes: new Map(), me: null, activeSect
 const $ = (id) => document.getElementById(id);
 const overlay = $('loadingOverlay');
 
-function showLoading(on) { overlay.classList.toggle('hidden', !on); }
+function showLoading(on) { overlay.classList.toggle('d-none', !on); }
 
 async function api(path, options = {}) {
   const res = await fetch(`${API_ROOT}${path}`, {
@@ -22,7 +22,7 @@ async function api(path, options = {}) {
 
 function onlyOpen(sectionName) {
   state.activeSection = sectionName;
-  document.querySelectorAll('.panel').forEach((panel) => panel.classList.toggle('is-active', panel.dataset.section === sectionName));
+  document.querySelectorAll('.app-section').forEach((section) => section.classList.toggle('is-active', section.dataset.section === sectionName));
 }
 
 function hasAssigned(userId) {
@@ -39,11 +39,12 @@ function completedResearchCountLast24h(userId) {
 }
 
 function taskCard(task, action, disabled = false, queueLabel = '', actionLabel = 'Check Out') {
-  const queue = queueLabel ? `<div class="queue-tag">${queueLabel}</div>` : '';
+  const queue = queueLabel ? `<span class="badge text-bg-info">${queueLabel}</span>` : '';
   const typeHelp = task.typeDescription
-    ? `<button type="button" class="help-btn" data-action="show-type-help" data-help-title="${task.type || 'Task type'}" data-help-text="${task.typeDescription}" title="What does this task type mean?" aria-label="Show task type help">?</button>`
+    ? `<button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" data-action="show-type-help" data-help-title="${task.type || 'Task type'}" data-help-text="${task.typeDescription}" title="What does this task type mean?" aria-label="Show task type help">?</button>`
     : '';
-  return `<article class="task-card">${queue}<div class="task-card-header"><span class="task-title">${task.type || 'Task'}</span>${typeHelp}</div><div class="task-card-body"><div class="task-desc">${task.description || ''}</div><div class="meta">Territory ${task.territory}</div><button class="task-action" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article>`;
+  const statusBadgeClass = task.status === 'Todo' ? 'text-bg-secondary' : task.status === 'In progress' ? 'text-bg-warning' : task.status === 'Done' ? 'text-bg-primary' : 'text-bg-success';
+  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div><div class="fw-semibold">${task.type || 'Task'}</div><span class="badge text-bg-dark" title="Task type level">Level ${task.typeLevel || 0}</span></div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status">${task.status}</span><div class="task-desc">${task.description || ''}</div><div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
 }
 
 function pickField(fields, keys, fallback = '') {
@@ -91,7 +92,7 @@ async function loadData() {
 }
 
 function renderUsers() {
-  $('userList').innerHTML = state.users.map((u) => `<button class="user-btn" data-user-id="${u.id}"><strong>${u.name}</strong></button>`).join('');
+  $('userList').innerHTML = state.users.map((u) => `<div class="col"><button class="btn btn-outline-primary w-100 text-start" data-user-id="${u.id}" title="Choose ${u.name}"><strong>${u.name}</strong></button></div>`).join('');
 }
 
 function renderInbox() {
@@ -100,7 +101,7 @@ function renderInbox() {
   const completedInLast24h = completedResearchCountLast24h(state.me.id);
   const maxedOut = completedInLast24h >= MAX_RESEARCH_COMPLETIONS_PER_DAY;
 
-  $('inboxLock').classList.toggle('hidden', !(locked || maxedOut));
+  $('inboxLock').classList.toggle('d-none', !(locked || maxedOut));
   if (locked) $('inboxLock').textContent = 'You already have a task checked out. Complete it in My tasks first.';
   else if (maxedOut) $('inboxLock').textContent = 'Thank you so much for completing these tasks! check back tomorrow to continue helping out.';
 
@@ -108,8 +109,8 @@ function renderInbox() {
   const verify = state.me.level > 1 ? state.tasks.filter((t) => t.status === 'Done').slice(0, 5) : [];
 
   const researchDisabled = locked || maxedOut;
-  $('researchList').innerHTML = research.map((t) => taskCard(t, 'claim-research', researchDisabled)).join('') || '<p class="meta">No research tasks available.</p>';
-  $('verifyList').innerHTML = verify.map((t) => taskCard(t, 'claim-verify', locked)).join('') || '<p class="meta">No verify tasks available.</p>';
+  $('researchList').innerHTML = research.map((t) => taskCard(t, 'claim-research', researchDisabled)).join('') || '<p class="text-body-secondary small">No research tasks available.</p>';
+  $('verifyList').innerHTML = verify.map((t) => taskCard(t, 'claim-verify', locked)).join('') || '<p class="text-body-secondary small">No verify tasks available.</p>';
 }
 
 function renderMyTasks() {
@@ -120,25 +121,27 @@ function renderMyTasks() {
     return '';
   };
 
-  $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete', false, queueLabelForTask(t), 'Complete')).join('') || '<p class="meta">No assigned tasks.</p>';
+  $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete', false, queueLabelForTask(t), 'Complete')).join('') || '<p class="text-body-secondary small">No assigned tasks.</p>';
 }
 
 function showMe() { $('currentUserLabel').textContent = state.me ? state.me.name : 'No user'; }
 
 function confirmAction(message) {
   return new Promise((resolve) => {
-    const dialog = $('confirmDialog');
+    const modalEl = $('confirmModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     $('confirmText').textContent = message;
-    dialog.showModal();
-    $('confirmOk').onclick = () => { dialog.close(); resolve(true); };
-    $('confirmCancel').onclick = () => { dialog.close(); resolve(false); };
+    $('confirmOk').onclick = () => { modal.hide(); resolve(true); };
+    $('confirmCancel').onclick = () => { resolve(false); };
+    modal.show();
   });
 }
 
 function showTypeHelp(title, description) {
   $('helpTitle').textContent = title;
   $('helpDescription').textContent = description;
-  $('helpDialog').showModal();
+  const modal = bootstrap.Modal.getOrCreateInstance($('helpModal'));
+  modal.show();
 }
 
 async function patchTask(id, fields) {
@@ -172,8 +175,6 @@ document.addEventListener('click', async (event) => {
     onlyOpen('user');
     return;
   }
-
-  if (btn.id === 'helpClose') { $('helpDialog').close(); return; }
 
   const section = btn.dataset.open;
   if (section) { onlyOpen(section); return; }
