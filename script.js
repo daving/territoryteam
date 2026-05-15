@@ -1,7 +1,7 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -140,14 +140,22 @@ function confirmAction(message) {
 
 function showTypeHelp(title, description) {
   $('helpTitle').textContent = decodeURIComponent(title);
-  const parsed = decodeURIComponent(description);
-  const sanitized = sanitizeHelpHtml(parsed);
+  const parsed = decodeURIComponent(description || '');
+  const markdownHtml = renderHelpMarkdown(parsed);
+  const sanitized = sanitizeHelpHtml(markdownHtml);
   $('helpDescription').innerHTML = sanitized;
   const modal = bootstrap.Modal.getOrCreateInstance($('helpModal'));
   modal.show();
 }
 
 function sanitizeHelpHtml(input) {
+  if (window.DOMPurify) {
+    return window.DOMPurify.sanitize(String(input || ''), {
+      ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'em', 'strong', 'b', 'i', 'a', 'code', 'pre', 'blockquote', 'hr'],
+      ALLOWED_ATTR: ['href', 'target', 'rel']
+    });
+  }
+
   const template = document.createElement('template');
   template.innerHTML = String(input || '');
   const allowedTags = new Set(['P', 'BR', 'UL', 'OL', 'LI', 'EM', 'STRONG', 'B', 'I', 'A', 'CODE']);
@@ -179,6 +187,18 @@ function sanitizeHelpHtml(input) {
 
   walk(template.content);
   return template.innerHTML;
+}
+
+function renderHelpMarkdown(input) {
+  const raw = String(input || '');
+  if (window.marked?.parse) {
+    return window.marked.parse(raw, { breaks: true, gfm: true });
+  }
+
+  return raw
+    .split(/\n{2,}/)
+    .map((chunk) => `<p>${chunk.replace(/\n/g, '<br>')}</p>`)
+    .join('');
 }
 
 async function patchTask(id, fields) {

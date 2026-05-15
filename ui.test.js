@@ -9,6 +9,8 @@ const css = fs.readFileSync('style.css', 'utf8');
 test('frontend uses Bootstrap 5.3 CDN assets', () => {
   assert.match(html, /bootstrap@5\.3\.3\/dist\/css\/bootstrap\.min\.css/);
   assert.match(html, /bootstrap@5\.3\.3\/dist\/js\/bootstrap\.bundle\.min\.js/);
+  assert.match(html, /cdn\.jsdelivr\.net\/npm\/marked\/marked\.min\.js/);
+  assert.match(html, /cdn\.jsdelivr\.net\/npm\/dompurify@3\.1\.6\/dist\/purify\.min\.js/);
 });
 
 test('sections remain card based and mobile-first', () => {
@@ -25,10 +27,13 @@ test('task cards render status badge and task type label', () => {
 
 test('task type help stores full description safely for modal rendering', () => {
   assert.match(js, /data-help-text="\$\{encodeURIComponent\(task\.typeDescription\)\}"/);
-  assert.match(js, /decodeURIComponent\(description\)/);
+  assert.match(js, /decodeURIComponent\(description \|\| ''\)/);
+  assert.match(js, /function renderHelpMarkdown\(input\)/);
+  assert.match(js, /window\.marked\?\.parse/);
   assert.match(js, /\$\('helpDescription'\)\.innerHTML = sanitized/);
   assert.match(js, /function sanitizeHelpHtml\(input\)/);
-  assert.match(js, /allowedTags = new Set\(\['P', 'BR', 'UL', 'OL', 'LI', 'EM', 'STRONG', 'B', 'I', 'A', 'CODE'\]\)/);
+  assert.match(js, /window\.DOMPurify/);
+  assert.match(js, /ALLOWED_TAGS: \['p', 'br', 'ul', 'ol', 'li', 'em', 'strong', 'b', 'i', 'a', 'code', 'pre', 'blockquote', 'hr'\]/);
 });
 
 test('confirm and help actions use Bootstrap modals', () => {
@@ -44,8 +49,8 @@ test('responsive sticky navbar exists', () => {
 
 test('app version is visible in the navbar and wired to config', () => {
   assert.match(html, /id="appVersion"/);
-  assert.match(html, /v1\.1\.0/);
-  assert.match(js, /const APP_VERSION = '1\.1\.0';/);
+  assert.match(html, /v1\.1\.1/);
+  assert.match(js, /const APP_VERSION = '1\.1\.1';/);
   assert.match(js, /\$\('appVersion'\)\.textContent = `v\$\{APP_VERSION\}`/);
   assert.match(js, /window\.__appConfig = \{ BASE_ID, API_ROOT, STORAGE_KEY, APP_VERSION \};/);
 });
