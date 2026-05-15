@@ -36,7 +36,6 @@ test('layout uses vertical single-active panel behavior', () => {
   assert.match(css, /\.panel\.is-active \.panel-body/);
   assert.match(js, /classList\.toggle\('is-active'/);
   assert.match(css, /grid-template-columns:repeat\(auto-fit, minmax\(260px, 1fr\)\)/);
-  assert.match(css, /aspect-ratio:1\/1/);
 });
 
 test('task type fallback handles Airtable field name variations', () => {
@@ -55,4 +54,20 @@ test('task cards render explicit action buttons and blank descriptions when abse
   assert.match(js, /actionLabel = 'Check Out'/);
   assert.match(js, /taskCard\(t, 'complete', false, queueLabelForTask\(t\), 'Complete'\)/);
   assert.match(js, /task\.description \|\| ''/);
+});
+
+
+test('welcome copy is shown in top bar and includes help guidance tooltip', () => {
+  assert.match(html, /Hi! Thanks for helping with the territories\./);
+  assert.match(html, /ask me \(davin\) or ask the Territories WhatsApp group\./);
+  assert.match(html, /title="Need help\? Ask Davin or the Territories WhatsApp group\."/);
+});
+
+test('help popup supports long task type descriptions with scrolling', () => {
+  assert.match(css, /#helpDescription \{ max-height:50vh; overflow:auto; white-space:pre-wrap; \}/);
+});
+
+test('task cards no longer force square aspect ratio so single my-task card does not fill viewport', () => {
+  assert.match(css, /\.task-card \{ width:100%;/);
+  assert.doesNotMatch(css, /\.task-card, \.user-btn[^\n]*aspect-ratio:1\/1/);
 });

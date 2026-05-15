@@ -25,6 +25,7 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
 - User choice is remembered via `localStorage`; next visit skips user picker when possible.
 - Reset button clears saved user and restarts flow.
 - Loading overlay appears during API operations.
+- A welcome message is shown at the top with guidance to contact Davin or the Territories WhatsApp group for help.
 - Inbox behavior:
   - If the user already has assigned work (`In progress` as researcher, or `Done` as checker), claim actions are blocked.
   - If the user has completed 5 research tasks in the last rolling 24 hours (based on `done_time`), only **To Research** claims are blocked and a thank-you banner is shown.
@@ -35,15 +36,15 @@ GitHub Pages single-page mobile web app for territory task workflow, backed by A
   - researcher + `In progress`
   - checker + `Done`
   - queue labels so each card is marked `To Research` or `To Verify`
-- Card widths are constrained on desktop for better readability (`max-width: 44rem`).
 - Status transitions:
   - claim research => set `Researcher`, set `Status = In progress`
   - complete research => `In progress -> Done`, and set `done_time` to current ISO date-time
   - complete verify => `Done -> Verified`
 - Task card content:
-  - each task renders as a small square card with a header bar, border, and a separate action button
+  - each task renders as a compact card with a header bar, border, and a separate action button
   - territory label is shown as `Territory <number>`
   - task type `description` appears in a pop-up when `?` is clicked
+  - help pop-up content scrolls for long task type descriptions
   - no `?` button is shown when task type is blank
   - when description is missing, the description area stays blank (no fallback sentence)
   - Inbox cards use a **Check Out** action button; My tasks cards use a **Complete** action button
