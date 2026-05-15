@@ -1,8 +1,10 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
+const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-const state = { users: [], tasks: [], taskTypes: new Map(), me: null };
+const state = { users: [], tasks: [], taskTypes: new Map(), me: null, activeSection: 'user' };
 
 const $ = (id) => document.getElementById(id);
 const overlay = $('loadingOverlay');
@@ -19,8 +21,8 @@ async function api(path, options = {}) {
 }
 
 function onlyOpen(sectionName) {
-  const target = document.querySelector(`.panel[data-section="${sectionName}"]`);
-  if (target) target.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+  state.activeSection = sectionName;
+  document.querySelectorAll('.panel').forEach((panel) => panel.classList.toggle('is-active', panel.dataset.section === sectionName));
 }
 
 function hasAssigned(userId) {
@@ -31,9 +33,17 @@ function myTasks(userId) {
   return state.tasks.filter((t) => (t.researcherId === userId && t.status === 'In progress') || (t.checkerId === userId && t.status === 'Done'));
 }
 
+function completedResearchCountLast24h(userId) {
+  const cutoff = Date.now() - DAY_MS;
+  return state.tasks.filter((t) => t.researcherId === userId && t.doneTime && Date.parse(t.doneTime) >= cutoff).length;
+}
+
 function taskCard(task, action, disabled = false, queueLabel = '') {
   const queue = queueLabel ? `<div class="queue-tag">${queueLabel}</div>` : '';
-  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}>${queue}<span class="task-title">${task.type}</span>${task.description}<div class="meta">${task.territory}</div></button>`;
+  const typeHelp = task.typeDescription
+    ? `<button type="button" class="help-btn" data-action="show-type-help" data-help-title="${task.type || 'Task type'}" data-help-text="${task.typeDescription}" title="What does this task type mean?" aria-label="Show task type help">?</button>`
+    : '';
+  return `<button class="task-btn" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''}>${queue}<div class="task-header"><span class="task-title">${task.type || 'Untyped task'}</span>${typeHelp}</div><div class="task-desc">${task.description || 'No task description provided.'}</div><div class="meta">${task.territory}</div></button>`;
 }
 
 async function loadData() {
@@ -41,10 +51,10 @@ async function loadData() {
   try {
     const [users, tasks, tasktypes] = await Promise.all([api('/users'), api('/tasks'), api('/tasktypes')]);
     state.users = users.records.map((r) => ({ id: r.id, name: r.fields.Name, level: Number(r.fields.level || 1) }));
-    state.taskTypes = new Map(tasktypes.records.map((r) => [r.id, { name: r.fields.name || 'Unknown', level: Number(r.fields.level || 0) }]));
+    state.taskTypes = new Map(tasktypes.records.map((r) => [r.id, { name: r.fields.name || '', level: Number(r.fields.level || 0), description: r.fields.description || '' }]));
     state.tasks = tasks.records.map((r) => {
       const typeId = (r.fields.Type || [])[0];
-      const type = state.taskTypes.get(typeId) || { name: 'Unknown', level: 0 };
+      const type = state.taskTypes.get(typeId) || { name: '', level: 0, description: '' };
       return {
         id: r.id,
         territory: r.fields.Territory || '',
@@ -53,7 +63,9 @@ async function loadData() {
         researcherId: (r.fields.Researcher || [])[0] || null,
         checkerId: (r.fields.Checker || [])[0] || null,
         type: type.name,
-        typeLevel: type.level
+        typeLevel: type.level,
+        typeDescription: type.description,
+        doneTime: r.fields.done_time || null
       };
     });
   } finally {
@@ -62,20 +74,25 @@ async function loadData() {
 }
 
 function renderUsers() {
-  $('userList').innerHTML = state.users.map((u) => `<button class="user-btn" data-user-id="${u.id}"><strong>${u.name}</strong><div class="meta">Level ${u.level}</div></button>`).join('');
+  $('userList').innerHTML = state.users.map((u) => `<button class="user-btn" data-user-id="${u.id}"><strong>${u.name}</strong></button>`).join('');
 }
 
 function renderInbox() {
   if (!state.me) return;
   const locked = hasAssigned(state.me.id);
-  $('inboxLock').classList.toggle('hidden', !locked);
-  $('inboxLock').textContent = locked ? 'You already have a task checked out. Complete it in My tasks first.' : '';
+  const completedInLast24h = completedResearchCountLast24h(state.me.id);
+  const maxedOut = completedInLast24h >= MAX_RESEARCH_COMPLETIONS_PER_DAY;
 
-  const research = state.tasks.filter((t) => t.status === 'Todo' && t.typeLevel <= state.me.level).slice(0, 5);
+  $('inboxLock').classList.toggle('hidden', !(locked || maxedOut));
+  if (locked) $('inboxLock').textContent = 'You already have a task checked out. Complete it in My tasks first.';
+  else if (maxedOut) $('inboxLock').textContent = 'Thank you so much for completing these tasks! check back tomorrow to continue helping out.';
+
+  const research = state.tasks.filter((t) => t.status === 'Todo').slice(0, 5);
   const verify = state.me.level > 1 ? state.tasks.filter((t) => t.status === 'Done').slice(0, 5) : [];
 
-  $('researchList').innerHTML = research.map((t) => taskCard(t, 'claim-research', locked)).join('');
-  $('verifyList').innerHTML = verify.map((t) => taskCard(t, 'claim-verify', locked)).join('');
+  const researchDisabled = locked || maxedOut;
+  $('researchList').innerHTML = research.map((t) => taskCard(t, 'claim-research', researchDisabled)).join('') || '<p class="meta">No research tasks available.</p>';
+  $('verifyList').innerHTML = verify.map((t) => taskCard(t, 'claim-verify', locked)).join('') || '<p class="meta">No verify tasks available.</p>';
 }
 
 function renderMyTasks() {
@@ -89,9 +106,7 @@ function renderMyTasks() {
   $('myTasksList').innerHTML = myTasks(state.me.id).map((t) => taskCard(t, 'complete', false, queueLabelForTask(t))).join('') || '<p class="meta">No assigned tasks.</p>';
 }
 
-function showMe() {
-  $('currentUserLabel').textContent = state.me ? state.me.name : 'No user';
-}
+function showMe() { $('currentUserLabel').textContent = state.me ? state.me.name : 'No user'; }
 
 function confirmAction(message) {
   return new Promise((resolve) => {
@@ -101,6 +116,12 @@ function confirmAction(message) {
     $('confirmOk').onclick = () => { dialog.close(); resolve(true); };
     $('confirmCancel').onclick = () => { dialog.close(); resolve(false); };
   });
+}
+
+function showTypeHelp(title, description) {
+  $('helpTitle').textContent = title;
+  $('helpDescription').textContent = description;
+  $('helpDialog').showModal();
 }
 
 async function patchTask(id, fields) {
@@ -116,16 +137,10 @@ async function patchTask(id, fields) {
 async function boot() {
   await loadData();
   renderUsers();
-
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) state.me = state.users.find((u) => u.id === saved) || null;
-
-  showMe();
-  renderInbox();
-  renderMyTasks();
-
-  if (!state.me) onlyOpen('user');
-  else onlyOpen(hasAssigned(state.me.id) ? 'tasks' : 'inbox');
+  showMe(); renderInbox(); renderMyTasks();
+  if (!state.me) onlyOpen('user'); else onlyOpen(hasAssigned(state.me.id) ? 'tasks' : 'inbox');
 }
 
 document.addEventListener('click', async (event) => {
@@ -141,16 +156,21 @@ document.addEventListener('click', async (event) => {
     return;
   }
 
+  if (btn.id === 'helpClose') { $('helpDialog').close(); return; }
+
   const section = btn.dataset.open;
   if (section) { onlyOpen(section); return; }
+
+  if (btn.dataset.action === 'show-type-help') {
+    showTypeHelp(btn.dataset.helpTitle || 'Task type', btn.dataset.helpText || '');
+    return;
+  }
 
   const userId = btn.dataset.userId;
   if (userId) {
     state.me = state.users.find((u) => u.id === userId) || null;
     localStorage.setItem(STORAGE_KEY, userId);
-    showMe();
-    renderInbox();
-    renderMyTasks();
+    showMe(); renderInbox(); renderMyTasks();
     onlyOpen(hasAssigned(userId) ? 'tasks' : 'inbox');
     return;
   }
@@ -172,7 +192,7 @@ document.addEventListener('click', async (event) => {
   if (action === 'complete' && await confirmAction('Complete this task?')) {
     const task = state.tasks.find((t) => t.id === id);
     if (!task) return;
-    if (task.status === 'In progress') await patchTask(id, { Status: 'Done' });
+    if (task.status === 'In progress') await patchTask(id, { Status: 'Done', done_time: new Date().toISOString() });
     else if (task.status === 'Done') await patchTask(id, { Status: 'Verified' });
     onlyOpen(hasAssigned(state.me.id) ? 'tasks' : 'inbox');
   }

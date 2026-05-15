@@ -30,10 +30,10 @@
     </section>
 
     <section class="panel card" data-section="inbox">
-      <button class="panel-title" data-open="inbox" title="Claim new work">Inbox</button>
+      <button class="panel-title" data-open="inbox" title="Claim new work from To Research and To verify">Inbox</button>
       <div class="panel-body" id="inboxPanel">
         <p id="inboxLock" class="lock hidden"></p>
-        <p class="hint">If you already have assigned work, inbox actions are disabled. Data sync runs through secure worker API at territoryteam-api.daving.workers.dev.</p>
+        <p class="hint" title="To Research is paused after 5 research completions in 24 hours.">If you already have assigned work, inbox actions are disabled. To Research also pauses after 5 completed research tasks in a rolling 24-hour window. Data sync runs through secure worker API at territoryteam-api.daving.workers.dev.</p>
 
         <h2>To Research</h2>
         <div id="researchList" class="cards"></div>
@@ -51,6 +51,14 @@
       </div>
     </section>
   </main>
+
+  <dialog id="helpDialog">
+    <h3 id="helpTitle"></h3>
+    <p id="helpDescription"></p>
+    <menu>
+      <button id="helpClose">Close</button>
+    </menu>
+  </dialog>
 
   <dialog id="confirmDialog">
     <p id="confirmText"></p>
