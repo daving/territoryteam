@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Territory Team</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="loadingOverlay" class="overlay hidden" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <p>Syncing with secure API...</p>
+  </div>
+
+  <header class="topbar card">
+    <h1>Territory Team</h1>
+    <div class="topbar-actions">
+      <span id="currentUserLabel" class="pill" title="Shows your selected user"></span>
+      <button id="resetBtn" title="Clear remembered user and restart">Reset app</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel card" data-section="user">
+      <button class="panel-title" data-open="user" title="Select your name first">User</button>
+      <div class="panel-body" id="userPanel">
+        <p class="hint">Pick your name. We remember it for next visit.</p>
+        <div id="userList" class="cards"></div>
+      </div>
+    </section>
+
+    <section class="panel card" data-section="inbox">
+      <button class="panel-title" data-open="inbox" title="Claim new work">Inbox</button>
+      <div class="panel-body" id="inboxPanel">
+        <p id="inboxLock" class="lock hidden"></p>
+        <p class="hint">If you already have assigned work, inbox actions are disabled. Data sync runs through secure worker API at territoryteam-api.daving.workers.dev.</p>
+
+        <h2>Research</h2>
+        <div id="researchList" class="cards"></div>
+
+        <h2>To verify</h2>
+        <div id="verifyList" class="cards"></div>
+      </div>
+    </section>
+
+    <section class="panel card" data-section="tasks">
+      <button class="panel-title" data-open="tasks" title="View and complete your assigned work">My tasks</button>
+      <div class="panel-body" id="tasksPanel">
+        <p class="hint">Tap a card to mark the task complete for your role.</p>
+        <div id="myTasksList" class="cards"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="confirmDialog">
+    <p id="confirmText"></p>
+    <menu>
+      <button id="confirmCancel">Cancel</button>
+      <button id="confirmOk">Confirm</button>
+    </menu>
+  </dialog>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
