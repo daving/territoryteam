@@ -26,8 +26,19 @@ test('task type help dialog exists and type help button is conditional', () => {
   assert.match(js, /task\.typeDescription\s*\?/);
 });
 
+test('task card territory label is prefixed with Territory', () => {
+  assert.match(js, /Territory \$\{task\.territory\}/);
+  assert.doesNotMatch(js, /Untyped task/);
+});
+
 test('layout uses vertical single-active panel behavior', () => {
   assert.match(css, /flex-direction:column/);
   assert.match(css, /\.panel\.is-active \.panel-body/);
   assert.match(js, /classList\.toggle\('is-active'/);
+  assert.match(css, /grid-template-columns:repeat\(auto-fit, minmax\(260px, 1fr\)\)/);
+});
+
+test('task type fallback handles Airtable field name variations', () => {
+  assert.match(js, /pickField\(r\.fields, \['name', 'Name'\], 'Task'\)/);
+  assert.match(js, /rawType = r\.fields\.Type \|\| r\.fields\.type \|\| null/);
 });
