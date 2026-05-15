@@ -12,7 +12,8 @@ body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 .panel.is-active .panel-body { max-height:70vh; overflow-y:auto; }
 .hidden { display:none !important; }
 .cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px; align-items:stretch; }
-.task-card, .user-btn { width:100%; text-align:left; border:1px solid #dbe1ea; background:#fff; border-radius:10px; padding:0; display:flex; flex-direction:column; gap:0; overflow:hidden; aspect-ratio:1/1; }
+.user-btn { width:100%; text-align:left; border:1px solid #dbe1ea; background:#fff; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:0; overflow:hidden; }
+.task-card { width:100%; text-align:left; border:1px solid #dbe1ea; background:#fff; border-radius:10px; padding:0; display:flex; flex-direction:column; gap:0; overflow:hidden; }
 .task-action:disabled { opacity:.5; cursor:not-allowed; }
 .task-card-header { background:#eef2ff; border-bottom:1px solid #dbe1ea; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .task-card-body { padding:10px; display:flex; flex-direction:column; gap:8px; height:100%; }
@@ -28,3 +29,8 @@ body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
 .spinner { width:44px; height:44px; border:4px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg);} }
+
+
+.welcome-message { margin:6px 0 0; font-size:.92rem; color:#374151; max-width:70ch; }
+#helpDialog { width:min(640px, 92vw); }
+#helpDescription { max-height:50vh; overflow:auto; white-space:pre-wrap; }
