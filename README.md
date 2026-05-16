@@ -37,10 +37,12 @@ Current app version: **1.2.0**.
   - If the user has completed 5 research tasks in the last rolling 24 hours (based on `done_time`), only **To Research** claims are blocked and a thank-you banner is shown.
 - Inbox cards:
   - **To Research:** up to 5 `Todo` tasks
-  - **To verify:** up to 5 `Done` tasks when user level > 1
+  - **To Verify:** up to 5 `Done` tasks when user level > 1
+  - For users with **exactly level 2**, `To Verify` excludes tasks where they are already the `Researcher`.
+  - Level 3+ users can still see and claim those tasks in `To Verify`.
 - My tasks cards include:
   - researcher + `In progress`
-  - checker + `Done`
+  - checker + `Done` (presented in the UI label as `Needs verification`)
   - queue labels so each card is marked `To Research` or `To Verify`
 - Status transitions:
   - claim research => set `Researcher`, set `Status = In progress`

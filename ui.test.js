@@ -22,7 +22,8 @@ test('sections remain card based and mobile-first', () => {
 
 test('task cards render status badge and task type label', () => {
   assert.match(js, /Task Type: \$\{task\.type \|\| 'Task'\}/);
-  assert.match(js, /Current task status/);
+  assert.match(js, /Current task status shown in app/);
+  assert.match(js, /const statusLabel = task\.status === 'Done' \? 'Needs verification' : task\.status/);
 });
 
 test('task type help stores full description safely for modal rendering', () => {
@@ -48,8 +49,13 @@ test('completion confirmation includes notes field and guidance text', () => {
   assert.match(html, /id="confirmNotesGroup"/);
   assert.match(html, /for="confirmNotes"/);
   assert.match(js, /Are you sure\? Add notes below if you want\./);
+  assert.match(js, /Status: 'Done'/);
   assert.match(js, /'research notes': notes/);
   assert.match(js, /'checker notes': notes/);
+});
+
+test('verify inbox excludes level 2 users from their own researched tasks', () => {
+  assert.match(js, /t\.status === 'Done' && \(state\.me\.level > 2 \|\| t\.researcherId !== state\.me\.id\)/);
 });
 
 test('claim confirmation does not show notes field', () => {
