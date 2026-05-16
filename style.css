@@ -17,3 +17,16 @@ body { min-height: 100vh; }
 .app-section.is-active { display: block; }
 
 .task-desc { min-height: 2.5rem; white-space: pre-wrap; }
+
+.btn-pink {
+  background: #f8d7e8;
+  border-color: #e8a6c8;
+  color: #6b2146;
+}
+
+.btn-pink:hover,
+.btn-pink:focus {
+  background: #f3c1dc;
+  border-color: #de8fba;
+  color: #571a39;
+}

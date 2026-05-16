@@ -64,6 +64,14 @@ test('claim confirmation does not show notes field', () => {
   assert.match(js, /confirmAction\('Claim this verification task\?', \{ showNotes: false \}\)/);
 });
 
+
+test('to verify cards show pink Research Notes button when research notes exist', () => {
+  assert.match(js, /const showResearchNotes = hasResearchNotes && \(action === 'claim-verify' \|\| queueLabel === 'To Verify'\)/);
+  assert.match(js, /data-action=\"show-research-notes\"/);
+  assert.match(js, /showTypeHelp\('Research Notes', btn\.dataset\.notes \|\| ''\)/);
+  assert.match(css, /\.btn-pink \{/);
+});
+
 test('responsive sticky navbar exists', () => {
   assert.match(html, /navbar navbar-expand-lg/);
   assert.match(html, /sticky-top/);
@@ -71,8 +79,8 @@ test('responsive sticky navbar exists', () => {
 
 test('app version is visible in the navbar and wired to config', () => {
   assert.match(html, /id="appVersion"/);
-  assert.match(html, /v1\.2\.0/);
-  assert.match(js, /const APP_VERSION = '1\.2\.0';/);
+  assert.match(html, /v1\.2\.1/);
+  assert.match(js, /const APP_VERSION = '1\.2\.1';/);
   assert.match(js, /\$\('appVersion'\)\.textContent = `v\$\{APP_VERSION\}`/);
   assert.match(js, /window\.__appConfig = \{ BASE_ID, API_ROOT, STORAGE_KEY, APP_VERSION \};/);
 });

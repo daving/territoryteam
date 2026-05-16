@@ -2,7 +2,7 @@
 
 GitHub Pages single-page mobile web app for territory task workflow, backed by Airtable through a secure serverless proxy.
 
-Current app version: **1.2.0**.
+Current app version: **1.2.1**.
 
 ## Files
 - `index.html` – app UI and sections
@@ -92,3 +92,5 @@ node --check script.js
 - A multiline **Notes** textarea is shown under the message and above the Confirm/Cancel buttons.
 - The textarea has an explanatory tooltip/title: `Optional notes saved with task completion`.
 - When claiming a task from Inbox (`Claim this research task?` / `Claim this verification task?`), the confirmation dialog hides the notes field entirely so claim actions are a simple confirm/cancel step.
+
+- In any **To Verify** card (Inbox or My Tasks), a pink **Research Notes** button appears when the task has saved `research notes`; it opens a modal so verifiers can review context before completing verification.
