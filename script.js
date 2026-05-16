@@ -44,8 +44,9 @@ function taskCard(task, action, disabled = false, queueLabel = '', actionLabel =
   const typeHelp = task.typeDescription
     ? `<button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" data-action="show-type-help" data-help-title="${encodeURIComponent(task.type || 'Task type')}" data-help-text="${encodeURIComponent(task.typeDescription)}" title="Show full task type instructions" aria-label="Show task type help">?</button>`
     : '';
+  const statusLabel = task.status === 'Done' ? 'Needs verification' : task.status;
   const statusBadgeClass = task.status === 'Todo' ? 'text-bg-secondary' : task.status === 'In progress' ? 'text-bg-warning' : task.status === 'Done' ? 'text-bg-primary' : 'text-bg-success';
-  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div class="fw-semibold">Task Type: ${task.type || 'Task'}</div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status">${task.status}</span><div class="task-desc">${task.description || ''}</div><div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
+  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div class="fw-semibold">Task Type: ${task.type || 'Task'}</div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status shown in app">${statusLabel}</span><div class="task-desc">${task.description || ''}</div><div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
 }
 
 function pickField(fields, keys, fallback = '') {
@@ -107,7 +108,9 @@ function renderInbox() {
   else if (maxedOut) $('inboxLock').textContent = 'Thank you so much for completing these tasks! check back tomorrow to continue helping out.';
 
   const research = state.tasks.filter((t) => t.status === 'Todo').slice(0, 5);
-  const verify = state.me.level > 1 ? state.tasks.filter((t) => t.status === 'Done').slice(0, 5) : [];
+  const verify = state.me.level > 1
+    ? state.tasks.filter((t) => t.status === 'Done' && (state.me.level > 2 || t.researcherId !== state.me.id)).slice(0, 5)
+    : [];
 
   const researchDisabled = locked || maxedOut;
   $('researchList').innerHTML = research.map((t) => taskCard(t, 'claim-research', researchDisabled)).join('') || '<p class="text-body-secondary small">No research tasks available.</p>';
