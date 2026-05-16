@@ -1,7 +1,7 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.2.1';
 const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -46,7 +46,12 @@ function taskCard(task, action, disabled = false, queueLabel = '', actionLabel =
     : '';
   const statusLabel = task.status === 'Done' ? 'Needs verification' : task.status;
   const statusBadgeClass = task.status === 'Todo' ? 'text-bg-secondary' : task.status === 'In progress' ? 'text-bg-warning' : task.status === 'Done' ? 'text-bg-primary' : 'text-bg-success';
-  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div class="fw-semibold">Task Type: ${task.type || 'Task'}</div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status shown in app">${statusLabel}</span><div class="task-desc">${task.description || ''}</div><div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
+  const hasResearchNotes = Boolean((task.researchNotes || '').trim());
+  const showResearchNotes = hasResearchNotes && (action === 'claim-verify' || queueLabel === 'To Verify');
+  const researchNotesButton = showResearchNotes
+    ? `<button class="btn btn-sm btn-pink" data-action="show-research-notes" data-notes="${encodeURIComponent(task.researchNotes)}" title="Open research notes saved by the researcher">Research Notes</button>`
+    : '';
+  return `<div class="col"><article class="card h-100"><div class="card-header d-flex justify-content-between align-items-center gap-2"><div class="fw-semibold">Task Type: ${task.type || 'Task'}</div>${typeHelp}</div><div class="card-body d-flex flex-column gap-2">${queue}<span class="badge ${statusBadgeClass} align-self-start" title="Current task status shown in app">${statusLabel}</span><div class="task-desc">${task.description || ''}</div>${researchNotesButton}<div class="text-body-secondary small">Territory ${task.territory}</div><button class="btn btn-outline-primary mt-auto" data-action="${action}" data-id="${task.id}" ${disabled ? 'disabled' : ''} title="${actionLabel} this task">${actionLabel}</button></div></article></div>`;
 }
 
 function pickField(fields, keys, fallback = '') {
@@ -85,7 +90,8 @@ async function loadData() {
         type: type.name,
         typeLevel: type.level,
         typeDescription: type.description,
-        doneTime: r.fields.done_time || null
+        doneTime: r.fields.done_time || null,
+        researchNotes: r.fields['research notes'] || ''
       };
     });
   } finally {
@@ -260,6 +266,11 @@ document.addEventListener('click', async (event) => {
 
   if (btn.dataset.action === 'show-type-help') {
     showTypeHelp(btn.dataset.helpTitle || 'Task type', btn.dataset.helpText || '');
+    return;
+  }
+
+  if (btn.dataset.action === 'show-research-notes') {
+    showTypeHelp('Research Notes', btn.dataset.notes || '');
     return;
   }
 
