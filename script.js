@@ -1,7 +1,7 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
-const APP_VERSION = '1.2.1';
+const APP_VERSION = '1.2.2';
 const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -27,11 +27,11 @@ function onlyOpen(sectionName) {
 }
 
 function hasAssigned(userId) {
-  return state.tasks.some((t) => (t.researcherId === userId && t.status === 'In progress') || (t.checkerId === userId && t.status === 'Done'));
+  return state.tasks.some((t) => (t.researcherId === userId && t.status === 'In progress') || (t.checkerId === userId && t.status === 'Verifying'));
 }
 
 function myTasks(userId) {
-  return state.tasks.filter((t) => (t.researcherId === userId && t.status === 'In progress') || (t.checkerId === userId && t.status === 'Done'));
+  return state.tasks.filter((t) => (t.researcherId === userId && t.status === 'In progress') || (t.checkerId === userId && t.status === 'Verifying'));
 }
 
 function completedResearchCountLast24h(userId) {
@@ -127,7 +127,7 @@ function renderMyTasks() {
   if (!state.me) return;
   const queueLabelForTask = (t) => {
     if (t.researcherId === state.me.id && t.status === 'In progress') return 'To Research';
-    if (t.checkerId === state.me.id && t.status === 'Done') return 'To Verify';
+    if (t.checkerId === state.me.id && t.status === 'Verifying') return 'To Verify';
     return '';
   };
 
@@ -298,7 +298,7 @@ document.addEventListener('click', async (event) => {
   if (action === 'claim-verify') {
     const { confirmed } = await confirmAction('Claim this verification task?', { showNotes: false });
     if (confirmed) {
-      await patchTask(id, { Checker: [state.me.id] });
+      await patchTask(id, { Checker: [state.me.id], Status: 'Verifying' });
       onlyOpen('tasks');
     }
   }
@@ -310,7 +310,7 @@ document.addEventListener('click', async (event) => {
     if (task.status === 'In progress') {
       const { confirmed, notes } = await confirmAction('Are you sure? Add notes below if you want.', { notesLabel: 'Notes' });
       if (confirmed) await patchTask(id, { Status: 'Done', done_time: new Date().toISOString(), 'research notes': notes });
-    } else if (task.status === 'Done') {
+    } else if (task.status === 'Verifying') {
       const { confirmed, notes } = await confirmAction('Are you sure? Add notes below if you want.', { notesLabel: 'Notes' });
       if (confirmed) await patchTask(id, { Status: 'Verified', 'checker notes': notes });
     }

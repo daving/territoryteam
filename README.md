@@ -2,7 +2,7 @@
 
 GitHub Pages single-page mobile web app for territory task workflow, backed by Airtable through a secure serverless proxy.
 
-Current app version: **1.2.1**.
+Current app version: **1.2.2**.
 
 ## Files
 - `index.html` – app UI and sections
@@ -33,7 +33,7 @@ Current app version: **1.2.1**.
 - Loading overlay appears during API operations.
 - A welcome message is shown at the top with guidance to contact Davin or the Territories WhatsApp group for help.
 - Inbox behavior:
-  - If the user already has assigned work (`In progress` as researcher, or `Done` as checker), claim actions are blocked.
+  - If the user already has assigned work (`In progress` as researcher, or `Verifying` as checker), claim actions are blocked.
   - If the user has completed 5 research tasks in the last rolling 24 hours (based on `done_time`), only **To Research** claims are blocked and a thank-you banner is shown.
 - Inbox cards:
   - **To Research:** up to 5 `Todo` tasks
@@ -42,12 +42,13 @@ Current app version: **1.2.1**.
   - Level 3+ users can still see and claim those tasks in `To Verify`.
 - My tasks cards include:
   - researcher + `In progress`
-  - checker + `Done` (presented in the UI label as `Needs verification`)
+  - checker + `Verifying` (task was checked out from the verify queue)
   - queue labels so each card is marked `To Research` or `To Verify`
 - Status transitions:
   - claim research => set `Researcher`, set `Status = In progress`
   - complete research => `In progress -> Done`, and set `done_time` to current ISO date-time
-  - complete verify => `Done -> Verified`
+  - claim verify => set `Checker`, set `Status = Verifying`
+- complete verify => `Verifying -> Verified`
 - Task card content:
   - uses Bootstrap cards in responsive grid columns
   - status is shown with a Bootstrap badge
@@ -88,7 +89,7 @@ node --check script.js
 
 
 ## Completion notes UX
-- When completing an `In progress` or `Done` task, the confirmation dialog says: `Are you sure? Add notes below if you want.`
+- When completing an `In progress` or `Verifying` task, the confirmation dialog says: `Are you sure? Add notes below if you want.`
 - A multiline **Notes** textarea is shown under the message and above the Confirm/Cancel buttons.
 - The textarea has an explanatory tooltip/title: `Optional notes saved with task completion`.
 - When claiming a task from Inbox (`Claim this research task?` / `Claim this verification task?`), the confirmation dialog hides the notes field entirely so claim actions are a simple confirm/cancel step.
