@@ -50,6 +50,8 @@ test('completion confirmation includes notes field and guidance text', () => {
   assert.match(html, /for="confirmNotes"/);
   assert.match(js, /Are you sure\? Add notes below if you want\./);
   assert.match(js, /Status: 'Done'/);
+  assert.match(js, /Status: 'Verifying'/);
+  assert.match(js, /task\.status === 'Verifying'/);
   assert.match(js, /'research notes': notes/);
   assert.match(js, /'checker notes': notes/);
 });
@@ -62,6 +64,7 @@ test('claim confirmation does not show notes field', () => {
   assert.match(js, /confirmNotesGroup\.classList\.toggle\('d-none', !showNotes\)/);
   assert.match(js, /confirmAction\('Claim this research task\?', \{ showNotes: false \}\)/);
   assert.match(js, /confirmAction\('Claim this verification task\?', \{ showNotes: false \}\)/);
+  assert.match(js, /Checker: \[state\.me\.id\], Status: 'Verifying'/);
 });
 
 
@@ -79,8 +82,8 @@ test('responsive sticky navbar exists', () => {
 
 test('app version is visible in the navbar and wired to config', () => {
   assert.match(html, /id="appVersion"/);
-  assert.match(html, /v1\.2\.1/);
-  assert.match(js, /const APP_VERSION = '1\.2\.1';/);
+  assert.match(html, /v1\.2\.2/);
+  assert.match(js, /const APP_VERSION = '1\.2\.2';/);
   assert.match(js, /\$\('appVersion'\)\.textContent = `v\$\{APP_VERSION\}`/);
   assert.match(js, /window\.__appConfig = \{ BASE_ID, API_ROOT, STORAGE_KEY, APP_VERSION \};/);
 });
