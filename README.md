@@ -89,3 +89,4 @@ node --check script.js
 - When completing an `In progress` or `Done` task, the confirmation dialog says: `Are you sure? Add notes below if you want.`
 - A multiline **Notes** textarea is shown under the message and above the Confirm/Cancel buttons.
 - The textarea has an explanatory tooltip/title: `Optional notes saved with task completion`.
+- When claiming a task from Inbox (`Claim this research task?` / `Claim this verification task?`), the confirmation dialog hides the notes field entirely so claim actions are a simple confirm/cancel step.

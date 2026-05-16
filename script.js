@@ -132,18 +132,27 @@ function confirmAction(message, options = {}) {
     const modalEl = $('confirmModal');
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     const notesLabel = options.notesLabel || 'Notes';
+    const showNotes = options.showNotes !== false;
     const confirmNotes = $('confirmNotes');
     const confirmNotesLabel = document.querySelector('label[for="confirmNotes"]');
+    const confirmNotesGroup = $('confirmNotesGroup');
 
     $('confirmText').textContent = message;
-    confirmNotesLabel.textContent = notesLabel;
-    confirmNotes.value = options.defaultNotes || '';
-    confirmNotes.placeholder = options.notesPlaceholder || 'Optional notes';
+    confirmNotesGroup.classList.toggle('d-none', !showNotes);
+
+    if (showNotes) {
+      confirmNotesLabel.textContent = notesLabel;
+      confirmNotes.value = options.defaultNotes || '';
+      confirmNotes.placeholder = options.notesPlaceholder || 'Optional notes';
+    } else {
+      confirmNotes.value = '';
+    }
 
     $('confirmOk').onclick = () => { modal.hide(); resolve({ confirmed: true, notes: confirmNotes.value.trim() }); };
     $('confirmCancel').onclick = () => { resolve({ confirmed: false, notes: '' }); };
     modal.show();
-    confirmNotes.focus();
+    if (showNotes) confirmNotes.focus();
+    else $('confirmOk').focus();
   });
 }
 
@@ -265,7 +274,7 @@ document.addEventListener('click', async (event) => {
   if (!action || !id || !state.me) return;
 
   if (action === 'claim-research') {
-    const { confirmed } = await confirmAction('Claim this research task?', { notesLabel: 'Reason (optional)' });
+    const { confirmed } = await confirmAction('Claim this research task?', { showNotes: false });
     if (confirmed) {
       await patchTask(id, { Researcher: [state.me.id], Status: 'In progress' });
       onlyOpen('tasks');
@@ -273,7 +282,7 @@ document.addEventListener('click', async (event) => {
   }
 
   if (action === 'claim-verify') {
-    const { confirmed } = await confirmAction('Claim this verification task?', { notesLabel: 'Reason (optional)' });
+    const { confirmed } = await confirmAction('Claim this verification task?', { showNotes: false });
     if (confirmed) {
       await patchTask(id, { Checker: [state.me.id] });
       onlyOpen('tasks');
