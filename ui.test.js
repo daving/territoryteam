@@ -82,8 +82,17 @@ test('responsive sticky navbar exists', () => {
 
 test('app version is visible in the navbar and wired to config', () => {
   assert.match(html, /id="appVersion"/);
-  assert.match(html, /v1\.2\.2/);
-  assert.match(js, /const APP_VERSION = '1\.2\.2';/);
+  assert.match(html, /v1\.2\.3/);
+  assert.match(js, /const APP_VERSION = '1\.2\.3';/);
   assert.match(js, /\$\('appVersion'\)\.textContent = `v\$\{APP_VERSION\}`/);
   assert.match(js, /window\.__appConfig = \{ BASE_ID, API_ROOT, STORAGE_KEY, APP_VERSION \};/);
+});
+
+
+test('app locks inbox and my tasks navigation until user is selected', () => {
+  assert.match(js, /function enforceUserLock\(\)/);
+  assert.match(js, /const locked = !state\.me/);
+  assert.match(js, /button\.disabled = shouldLock/);
+  assert.match(js, /if \(!state\.me && section !== 'user'\)/);
+  assert.match(js, /if \(shouldLock\) button\.title = 'Select a user first to unlock this view';/);
 });

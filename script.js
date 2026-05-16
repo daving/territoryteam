@@ -1,7 +1,7 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
-const APP_VERSION = '1.2.2';
+const APP_VERSION = '1.2.3';
 const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -24,6 +24,17 @@ async function api(path, options = {}) {
 function onlyOpen(sectionName) {
   state.activeSection = sectionName;
   document.querySelectorAll('.app-section').forEach((section) => section.classList.toggle('is-active', section.dataset.section === sectionName));
+}
+
+
+function enforceUserLock() {
+  const locked = !state.me;
+  document.querySelectorAll('[data-open]').forEach((button) => {
+    const target = button.dataset.open;
+    const shouldLock = locked && target !== 'user';
+    button.disabled = shouldLock;
+    if (shouldLock) button.title = 'Select a user first to unlock this view';
+  });
 }
 
 function hasAssigned(userId) {
@@ -246,6 +257,7 @@ async function boot() {
   if (saved) state.me = state.users.find((u) => u.id === saved) || null;
   showMe(); renderInbox(); renderMyTasks();
   if (!state.me) onlyOpen('user'); else onlyOpen(hasAssigned(state.me.id) ? 'tasks' : 'inbox');
+  enforceUserLock();
 }
 
 document.addEventListener('click', async (event) => {
@@ -258,11 +270,19 @@ document.addEventListener('click', async (event) => {
     showMe();
     renderUsers();
     onlyOpen('user');
+    enforceUserLock();
     return;
   }
 
   const section = btn.dataset.open;
-  if (section) { onlyOpen(section); return; }
+  if (section) {
+    if (!state.me && section !== 'user') {
+      onlyOpen('user');
+      return;
+    }
+    onlyOpen(section);
+    return;
+  }
 
   if (btn.dataset.action === 'show-type-help') {
     showTypeHelp(btn.dataset.helpTitle || 'Task type', btn.dataset.helpText || '');
@@ -280,6 +300,7 @@ document.addEventListener('click', async (event) => {
     localStorage.setItem(STORAGE_KEY, userId);
     showMe(); renderInbox(); renderMyTasks();
     onlyOpen(hasAssigned(userId) ? 'tasks' : 'inbox');
+    enforceUserLock();
     return;
   }
 
