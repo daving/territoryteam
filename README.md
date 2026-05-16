@@ -2,7 +2,7 @@
 
 GitHub Pages single-page mobile web app for territory task workflow, backed by Airtable through a secure serverless proxy.
 
-Current app version: **1.2.2**.
+Current app version: **1.2.3**.
 
 ## Files
 - `index.html` – app UI and sections
@@ -28,6 +28,7 @@ Current app version: **1.2.2**.
 - Navbar displays current app version for release tracking; increment it on every shipped update.
 - All major UI blocks are card-based, including section containers and task/user cards in responsive grid layouts.
 - Sections remain mobile-first; one section is visible at a time based on navbar shortcuts (`User`, `Inbox`, `My tasks`).
+- App is locked to the `User` section while no user is selected; navbar buttons for `Inbox` and `My tasks` stay disabled until a user is chosen.
 - User choice is remembered via `localStorage`; next visit skips user picker when possible.
 - Reset button clears saved user and restarts flow.
 - Loading overlay appears during API operations.
