@@ -1,7 +1,7 @@
 const BASE_ID = 'appwHGvBZYKK19CTU';
 const STORAGE_KEY = 'territoryteam.selectedUser';
 const API_ROOT = 'https://territoryteam-api.daving.workers.dev/api';
-const APP_VERSION = '1.1.1';
+const APP_VERSION = '1.2.0';
 const MAX_RESEARCH_COMPLETIONS_PER_DAY = 5;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -127,14 +127,23 @@ function renderMyTasks() {
 
 function showMe() { $('currentUserLabel').textContent = state.me ? state.me.name : 'No user'; }
 
-function confirmAction(message) {
+function confirmAction(message, options = {}) {
   return new Promise((resolve) => {
     const modalEl = $('confirmModal');
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    const notesLabel = options.notesLabel || 'Notes';
+    const confirmNotes = $('confirmNotes');
+    const confirmNotesLabel = document.querySelector('label[for="confirmNotes"]');
+
     $('confirmText').textContent = message;
-    $('confirmOk').onclick = () => { modal.hide(); resolve(true); };
-    $('confirmCancel').onclick = () => { resolve(false); };
+    confirmNotesLabel.textContent = notesLabel;
+    confirmNotes.value = options.defaultNotes || '';
+    confirmNotes.placeholder = options.notesPlaceholder || 'Optional notes';
+
+    $('confirmOk').onclick = () => { modal.hide(); resolve({ confirmed: true, notes: confirmNotes.value.trim() }); };
+    $('confirmCancel').onclick = () => { resolve({ confirmed: false, notes: '' }); };
     modal.show();
+    confirmNotes.focus();
   });
 }
 
@@ -255,21 +264,34 @@ document.addEventListener('click', async (event) => {
   const id = btn.dataset.id;
   if (!action || !id || !state.me) return;
 
-  if (action === 'claim-research' && await confirmAction('Claim this research task?')) {
-    await patchTask(id, { Researcher: [state.me.id], Status: 'In progress' });
-    onlyOpen('tasks');
+  if (action === 'claim-research') {
+    const { confirmed } = await confirmAction('Claim this research task?', { notesLabel: 'Reason (optional)' });
+    if (confirmed) {
+      await patchTask(id, { Researcher: [state.me.id], Status: 'In progress' });
+      onlyOpen('tasks');
+    }
   }
 
-  if (action === 'claim-verify' && await confirmAction('Claim this verification task?')) {
-    await patchTask(id, { Checker: [state.me.id] });
-    onlyOpen('tasks');
+  if (action === 'claim-verify') {
+    const { confirmed } = await confirmAction('Claim this verification task?', { notesLabel: 'Reason (optional)' });
+    if (confirmed) {
+      await patchTask(id, { Checker: [state.me.id] });
+      onlyOpen('tasks');
+    }
   }
 
-  if (action === 'complete' && await confirmAction('Complete this task?')) {
+  if (action === 'complete') {
     const task = state.tasks.find((t) => t.id === id);
     if (!task) return;
-    if (task.status === 'In progress') await patchTask(id, { Status: 'Done', done_time: new Date().toISOString() });
-    else if (task.status === 'Done') await patchTask(id, { Status: 'Verified' });
+
+    if (task.status === 'In progress') {
+      const { confirmed, notes } = await confirmAction('Are you sure? Add notes below if you want.', { notesLabel: 'Notes' });
+      if (confirmed) await patchTask(id, { Status: 'Done', done_time: new Date().toISOString(), 'research notes': notes });
+    } else if (task.status === 'Done') {
+      const { confirmed, notes } = await confirmAction('Are you sure? Add notes below if you want.', { notesLabel: 'Notes' });
+      if (confirmed) await patchTask(id, { Status: 'Verified', 'checker notes': notes });
+    }
+
     onlyOpen(hasAssigned(state.me.id) ? 'tasks' : 'inbox');
   }
 

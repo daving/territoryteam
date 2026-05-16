@@ -15,7 +15,7 @@
 
   <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top" title="Sticky navigation for quick access to all sections.">
     <div class="container-fluid">
-      <a class="navbar-brand fw-semibold" href="#" title="Territory Team app name and current release version.">Territory Team <span id="appVersion" class="badge text-bg-light border ms-1" title="Incremented every app update for release tracking.">v1.1.1</span></a>
+      <a class="navbar-brand fw-semibold" href="#" title="Territory Team app name and current release version.">Territory Team <span id="appVersion" class="badge text-bg-light border ms-1" title="Incremented every app update for release tracking.">v1.2.0</span></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -98,7 +98,11 @@
           <h3 class="modal-title fs-6" id="confirmTitle">Please confirm</h3>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body"><p id="confirmText" class="mb-0"></p></div>
+        <div class="modal-body">
+          <p id="confirmText" class="mb-2"></p>
+          <label for="confirmNotes" class="form-label small">Notes</label>
+          <textarea id="confirmNotes" class="form-control" rows="3" placeholder="Optional notes" title="Optional notes saved with task completion"></textarea>
+        </div>
         <div class="modal-footer">
           <button id="confirmCancel" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
           <button id="confirmOk" type="button" class="btn btn-primary">Confirm</button>

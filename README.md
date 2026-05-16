@@ -2,7 +2,7 @@
 
 GitHub Pages single-page mobile web app for territory task workflow, backed by Airtable through a secure serverless proxy.
 
-Current app version: **1.1.1**.
+Current app version: **1.2.0**.
 
 ## Files
 - `index.html` – app UI and sections
@@ -83,3 +83,9 @@ Current app version: **1.1.1**.
 node --test logic.test.js worker.test.js config.test.js ui.test.js
 node --check script.js
 ```
+
+
+## Completion notes UX
+- When completing an `In progress` or `Done` task, the confirmation dialog says: `Are you sure? Add notes below if you want.`
+- A multiline **Notes** textarea is shown under the message and above the Confirm/Cancel buttons.
+- The textarea has an explanatory tooltip/title: `Optional notes saved with task completion`.
