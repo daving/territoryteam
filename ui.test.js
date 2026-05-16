@@ -45,10 +45,17 @@ test('confirm and help actions use Bootstrap modals', () => {
 
 test('completion confirmation includes notes field and guidance text', () => {
   assert.match(html, /id="confirmNotes"/);
+  assert.match(html, /id="confirmNotesGroup"/);
   assert.match(html, /for="confirmNotes"/);
   assert.match(js, /Are you sure\? Add notes below if you want\./);
   assert.match(js, /'research notes': notes/);
   assert.match(js, /'checker notes': notes/);
+});
+
+test('claim confirmation does not show notes field', () => {
+  assert.match(js, /confirmNotesGroup\.classList\.toggle\('d-none', !showNotes\)/);
+  assert.match(js, /confirmAction\('Claim this research task\?', \{ showNotes: false \}\)/);
+  assert.match(js, /confirmAction\('Claim this verification task\?', \{ showNotes: false \}\)/);
 });
 
 test('responsive sticky navbar exists', () => {

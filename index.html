@@ -100,8 +100,10 @@
         </div>
         <div class="modal-body">
           <p id="confirmText" class="mb-2"></p>
-          <label for="confirmNotes" class="form-label small">Notes</label>
-          <textarea id="confirmNotes" class="form-control" rows="3" placeholder="Optional notes" title="Optional notes saved with task completion"></textarea>
+          <div id="confirmNotesGroup" title="Shown only when completing a task so completion notes can be saved.">
+            <label for="confirmNotes" class="form-label small">Notes</label>
+            <textarea id="confirmNotes" class="form-control" rows="3" placeholder="Optional notes" title="Optional notes saved with task completion"></textarea>
+          </div>
         </div>
         <div class="modal-footer">
           <button id="confirmCancel" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
